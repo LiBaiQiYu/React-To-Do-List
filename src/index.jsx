@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { Button, Input, Radio, Checkbox } from 'antd';
 
 function Top(props) {
-  const { inputValue, setInputValue, addList } = props.props;
+  const { inputValue, setInputValue, addList } = props.state;
   return (
     <div>
       <Input value={inputValue} onChange={(e) => setInputValue(e.target.value)} placeholder="请输入事项" style={{ width: 400 }} />
@@ -15,7 +15,7 @@ function Top(props) {
 
 function TodoList(props) {
   const [value, setValue] = useState(1);
-  const { listArr, setListArr } = props.props;
+  const { listArr, setListArr } = props.state;
   const onChange = (e) => {
     setValue(e.target.value);
   };
@@ -28,6 +28,16 @@ function TodoList(props) {
     })
     setListArr(newArr);
   }
+
+  let newItem = listArr.filter(item => {
+    if (value === 1) {
+      return item
+    } else if (value === 2) {
+      return item.checked
+    } else {
+      return !item.checked
+    }
+  }).map(i => <Item state={i} key={i.key} checkChange={(e) => checkChange(i.key, e)} />)
   return (
     <div>
       <Radio.Group onChange={onChange} value={value}>
@@ -36,24 +46,17 @@ function TodoList(props) {
         <Radio value={3}>未完成</Radio>
       </Radio.Group>
       <ul>
-        {listArr.filter(item => {
-          if (value === 1) {
-            return item
-          } else if (value === 2) {
-            return item.checked
-          } else {
-            return !item.checked
-          }
-        }).map(item => <Item props={item} key={item.key} checkChange={(e) => checkChange(item.key, e)} />)}
+        {newItem}
       </ul>
     </div>
   )
 }
 
 function Item(props) {
-  const { checked, inputValue, deleteItem } = props.props;
-  return (<li style={{ width: '300px', display: 'flex', justifyContent: 'space-between' }}>
-    <Checkbox onClick={props.checkChange} checked={checked}></Checkbox>
+  const { checked, inputValue, deleteItem } = props.state;
+  const { checkChange } = props;
+  return (<li style={{ width: '300px', display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+    <Checkbox onClick={checkChange} checked={checked}></Checkbox>
     <div style={{ flex: '1', padding: '0 10px' }}>{inputValue}</div>
     <Button onClick={() => deleteItem(inputValue)} type="dashed" danger >
       删除
@@ -101,8 +104,8 @@ function Main() {
 
   return (
     <div>
-      <Top props={topProps} />
-      <TodoList props={listProps} />
+      <Top state={topProps} />
+      <TodoList state={listProps} />
     </div>
   )
 }
