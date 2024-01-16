@@ -49,3 +49,16 @@ ol, ul {
 .game-info {
   margin-left: 20px;
 }
+
+@keyframes fill {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+.line{
+  transition: fill 2.4s linear forwards;
+}
