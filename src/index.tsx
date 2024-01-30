@@ -4,30 +4,48 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import '../src/index.css';
 import { TextField, Button, Checkbox, RadioGroup, FormControlLabel, Radio, FormGroup, Snackbar } from '@mui/material';
 
 interface Item {
   inputValue: string,
   deleteItem: (itemKey: string, set: React.Dispatch<React.SetStateAction<boolean>>, ref: React.MutableRefObject<boolean>) => void,
+  timer: React.MutableRefObject<NodeJS.Timeout | undefined>,
   key: string,
   checked: boolean,
 }
 
 function Top(props: { state: { inputValue: string; setInputValue: React.Dispatch<React.SetStateAction<string>>; addList: () => void; }; }) {
   const { inputValue, setInputValue, addList } = props.state;
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      addList()
+    }
+  }
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <TextField size='small' id="outlined-basic" label="Input Items" value={inputValue} onChange={(e) => setInputValue(e.target.value)} placeholder="input item" variant="outlined" />
+      <TextField size='small' id="outlined-basic" label="Todo Something" value={inputValue} onChange={(e) => setInputValue(e.target.value)} placeholder="input you want to do" variant="outlined" onKeyDown={handleKeyDown} />
       <Button style={{ marginLeft: '20px' }} variant="contained" onClick={addList}>ADD ITEM</Button>
     </div>
   )
 }
 
-function TodoList(props: { state: { listArr: Item[]; setListArr: React.Dispatch<React.SetStateAction<Item[]>>; }; }) {
+function TodoList(props: { state: { listArr: Item[]; setListArr: React.Dispatch<React.SetStateAction<Item[]>>; setOpen: React.Dispatch<React.SetStateAction<boolean>>; setMsg: React.Dispatch<React.SetStateAction<string>>; }; }) {
   const [value, setValue] = useState("1");
-  const { listArr, setListArr } = props.state;
+  const { listArr, setListArr, setOpen, setMsg } = props.state;
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
+    let del = false
+    listArr.forEach(item => {
+      if (item.timer.current) {
+        del = true
+        setMsg("Please do the action after deleting it!")
+        setOpen(true)
+      }
+    })
+    if (!del) {
+      setValue(e.target.value);
+    }
+
   };
   const checkChange = (key: string) => {
     console.log(key)
@@ -76,14 +94,16 @@ function ListItem(props: { state: Item; checkChange: (key: string) => void; }) {
   const [progress, setProgress] = useState(false);
   const progressRef = useRef(false);
   const undo = () => {
+    console.log(props)
     setProgress(false);
     progressRef.current = false;
+    clearTimeout(props.state.timer.current)
   }
-  return (<div style={{ position: 'relative', width: '240px', display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }} onMouseOver={() => setShow(true)} onMouseLeave={() => setShow(false)}>
-    <FormControlLabel style={{ width: 'calc(100% - 220px)' }} control={<Checkbox onClick={() => checkChange(key)} checked={checked} />} label={inputValue} />
-    <Button style={{ width: '100px', transition: '.2s', opacity: show ? '1' : '0', display: !progress ? 'block' : 'none' }} variant="contained" color="error" onClick={() => deleteItem(key, setProgress, progressRef)} >DEL ITEM</Button>
-    <Button style={{ width: '100px', transition: '.2s', opacity: show ? '1' : '0', display: progress ? 'block' : 'none' }} variant="contained" color="secondary" onClick={() => undo()} >UNDO</Button>
-    <div className='line' style={{ position: 'absolute', width: '100%', height: '2px', background: 'blue', transformOrigin: '0', opacity: progress ? '1' : '0' }}></div>
+  return (<div style={{ position: 'relative', width: 'auto', display: 'flex', justifyContent: 'space-between', marginBottom: '20px', paddingBottom: '20px', borderBottom: 'solid 1px #EEEEEE' }} onMouseOver={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+    <FormControlLabel style={{ width: '100%' }} control={<Checkbox onClick={() => checkChange(key)} checked={checked} />} label={inputValue} />
+    <Button style={{ flexShrink: 0, width: '100px', height: '50px', transition: '.2s', opacity: show ? '1' : '0', display: !progress ? 'block' : 'none' }} variant="contained" color="error" onClick={() => deleteItem(key, setProgress, progressRef)} >DEL ITEM</Button>
+    <Button style={{ flexShrink: 0, width: '100px', height: '50px', transition: '.2s', opacity: show ? '1' : '0', display: progress ? 'block' : 'none' }} variant="contained" color="secondary" onClick={() => undo()} >UNDO</Button>
+    <div className={progress ? 'line' : ''} style={{ position: 'absolute', width: '100%', height: '2px', background: '#DC004E', transformOrigin: '0', opacity: progress ? '1' : '0' }}></div>
   </div >)
 }
 
@@ -91,6 +111,8 @@ function Main() {
   const [inputValue, setInputValue] = useState('');
   const [listArr, setListArr] = useState<Item[]>([]);
   const [open, setOpen] = useState(false);
+  const [msg, setMsg] = useState('');
+  const timer = useRef<NodeJS.Timeout>();
   const list = useRef<Item[]>([]);
 
   const addList = () => {
@@ -109,6 +131,7 @@ function Main() {
         setListArr([...listArr, itemProps])
         setInputValue('')
       } else {
+        setMsg("Already had same item.")
         setOpen(true)
       }
     }
@@ -117,7 +140,9 @@ function Main() {
   const deleteItem = (itemKey: string, set: React.Dispatch<React.SetStateAction<boolean>>, ref: React.MutableRefObject<boolean>) => {
     set(true);
     ref.current = true;
-    // setListArr(list.current.filter((val) => val.key !== itemKey))
+    timer.current = setTimeout(() => {
+      setListArr(list.current.filter((val) => val.key !== itemKey))
+    }, 3000)
   }
 
   useEffect(() => {
@@ -133,11 +158,14 @@ function Main() {
   const listProps = {
     listArr: listArr,
     setListArr: setListArr,
+    setOpen: setOpen,
+    setMsg: setMsg
   }
 
   const itemProps = {
     inputValue: inputValue,
     deleteItem: deleteItem,
+    timer: timer,
     key: inputValue,
     checked: false,
   }
@@ -145,7 +173,7 @@ function Main() {
     setOpen(false)
   }
   return (
-    <div>
+    <div style={{ width: '800px', minHeight: '800px', margin: '20px auto', border: 'solid 1px #EEEEEE', borderRadius: '10px', boxSizing: 'border-box', padding: '20px', boxShadow: '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)' }}>
       <Top state={topProps} />
       <TodoList state={listProps} />
       <Snackbar
@@ -153,7 +181,7 @@ function Main() {
         open={open}
         autoHideDuration={2000}
         onClose={handleClose}
-        message="Already had same item."
+        message={msg}
       />
     </div>
   )
