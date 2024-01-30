@@ -10,7 +10,7 @@ import { TextField, Button, Checkbox, RadioGroup, FormControlLabel, Radio, FormG
 interface Item {
   inputValue: string,
   deleteItem: (itemKey: string, set: React.Dispatch<React.SetStateAction<boolean>>, ref: React.MutableRefObject<boolean>) => void,
-  timer: React.MutableRefObject<NodeJS.Timeout | undefined>,
+  timer: React.MutableRefObject<NodeJS.Timeout[] | undefined[]>,
   key: string,
   checked: boolean,
 }
@@ -34,13 +34,17 @@ function TodoList(props: { state: { listArr: Item[]; setListArr: React.Dispatch<
   const [value, setValue] = useState("1");
   const { listArr, setListArr, setOpen, setMsg } = props.state;
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(listArr)
     let del = false
     listArr.forEach(item => {
-      if (item.timer.current) {
-        del = true
-        setMsg("Please do the action after deleting it!")
-        setOpen(true)
-      }
+      item.timer.current?.forEach(i=>{
+        if (i) {
+          del = true
+          setMsg("Please do the action after deleting it!")
+          setOpen(true)
+        }
+      })
+      
     })
     if (!del) {
       setValue(e.target.value);
@@ -66,7 +70,7 @@ function TodoList(props: { state: { listArr: Item[]; setListArr: React.Dispatch<
     } else {
       return !item.checked
     }
-  }).map(i => <ListItem state={i} key={i.key} checkChange={() => checkChange(i.key)} />)
+  }).map((i,index) => <ListItem state={i} key={i.key} index={index} checkChange={() => checkChange(i.key)} />)
   return (
     <div>
       <RadioGroup
@@ -87,17 +91,18 @@ function TodoList(props: { state: { listArr: Item[]; setListArr: React.Dispatch<
 }
 
 
-function ListItem(props: { state: Item; checkChange: (key: string) => void; }) {
-  const { checked, inputValue, deleteItem, key } = props.state;
-  const { checkChange } = props;
+function ListItem(props: { state: Item; checkChange: (key: string) => void; index:number }) {
+  const { checked, inputValue, deleteItem, key, timer } = props.state;
+  const { checkChange,index } = props;
   const [show, setShow] = useState(false)
   const [progress, setProgress] = useState(false);
   const progressRef = useRef(false);
   const undo = () => {
-    console.log(props)
+    console.log(props,timer,index)
     setProgress(false);
     progressRef.current = false;
-    clearTimeout(props.state.timer.current)
+    clearTimeout(timer.current[index])
+    timer.current[index] = undefined
   }
   return (<div style={{ position: 'relative', width: 'auto', display: 'flex', justifyContent: 'space-between', marginBottom: '20px', paddingBottom: '20px', borderBottom: 'solid 1px #EEEEEE' }} onMouseOver={() => setShow(true)} onMouseLeave={() => setShow(false)}>
     <FormControlLabel style={{ width: '100%' }} control={<Checkbox onClick={() => checkChange(key)} checked={checked} />} label={inputValue} />
@@ -112,7 +117,7 @@ function Main() {
   const [listArr, setListArr] = useState<Item[]>([]);
   const [open, setOpen] = useState(false);
   const [msg, setMsg] = useState('');
-  const timer = useRef<NodeJS.Timeout>();
+  const timer = useRef<NodeJS.Timeout[]>([]);
   const list = useRef<Item[]>([]);
 
   const addList = () => {
@@ -139,10 +144,15 @@ function Main() {
 
   const deleteItem = (itemKey: string, set: React.Dispatch<React.SetStateAction<boolean>>, ref: React.MutableRefObject<boolean>) => {
     set(true);
+    console.log(list)
     ref.current = true;
-    timer.current = setTimeout(() => {
-      setListArr(list.current.filter((val) => val.key !== itemKey))
-    }, 3000)
+    list.current.forEach((item, index) => {
+      if (item.key === itemKey) {
+        timer.current[index] = setTimeout(() => {
+          setListArr(list.current.filter((val) => val.key !== itemKey))
+        }, 3000)
+      }
+    })
   }
 
   useEffect(() => {
