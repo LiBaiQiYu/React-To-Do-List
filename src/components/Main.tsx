@@ -10,7 +10,7 @@ export default function Main() {
   const [listArr, setListArr] = useState<Item[]>([]);
   const [open, setOpen] = useState(false);
   const [msg, setMsg] = useState('');
-  const timer = useRef<number[]>([]);
+  const timer = useRef<number[]|undefined[]>([]);
   const list = useRef<Item[]>([]);
 
   const addList = () => {
@@ -43,6 +43,7 @@ export default function Main() {
       if (item.key === itemKey) {
         timer.current[index] = setTimeout(() => {
           setListArr(list.current.filter((val) => val.key !== itemKey))
+          timer.current.splice(index,1)
         }, 3000)
       }
     })
@@ -50,7 +51,7 @@ export default function Main() {
 
   useEffect(() => {
     list.current = listArr //使用useEffect和Ref同步获取list数据
-  },[listArr])
+  })
 
   const topProps = {
     inputValue: inputValue,
