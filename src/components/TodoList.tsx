@@ -50,6 +50,7 @@ export default function TodoList(props: { state: { listArr: Item[]; setListArr: 
         aria-labelledby="demo-row-radio-buttons-group-label"
         name="row-radio-buttons-group"
         onChange={onChange} value={value}
+        style={{marginBottom:'20px'}}
       >
         <FormControlLabel value={"1"} control={<Radio />} label="ALL" />
         <FormControlLabel value={"2"} control={<Radio />} label="DONE" />
