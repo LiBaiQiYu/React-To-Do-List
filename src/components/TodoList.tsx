@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ListItem from "./ListItem.tsx";
+import ListItem from "./ListItem";
 import { RadioGroup, FormControlLabel, Radio, FormGroup } from '@mui/material';
 
 export default function TodoList(props: { state: { listArr: Item[]; setListArr: React.Dispatch<React.SetStateAction<Item[]>>; setOpen: React.Dispatch<React.SetStateAction<boolean>>; setMsg: React.Dispatch<React.SetStateAction<string>>; }; }) {

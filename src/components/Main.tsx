@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import Top from './Top.tsx';
-import TodoList from './TodoList.tsx';
+import Top from './Top';
+import TodoList from './TodoList';
 
 import { Snackbar } from '@mui/material';
 
@@ -50,7 +50,7 @@ export default function Main() {
 
   useEffect(() => {
     list.current = listArr //使用useEffect和Ref同步获取list数据
-  })
+  },[listArr])
 
   const topProps = {
     inputValue: inputValue,

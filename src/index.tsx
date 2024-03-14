@@ -7,7 +7,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import '../src/index.css';
 
-import Main from './components/Main.tsx';
+import Main from './components/Main';
 
 const dom = document.getElementById("root");
 if (dom !== null) {
