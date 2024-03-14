@@ -10,7 +10,7 @@ export default function Main() {
   const [listArr, setListArr] = useState<Item[]>([]);
   const [open, setOpen] = useState(false);
   const [msg, setMsg] = useState('');
-  const timer = useRef<NodeJS.Timeout[]>([]);
+  const timer = useRef<number[]>([]);
   const list = useRef<Item[]>([]);
 
   const addList = () => {

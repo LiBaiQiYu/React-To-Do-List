@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Button, Checkbox, FormControlLabel } from '@mui/material';
 
 export default function ListItem(props: { state: Item; checkChange: (key: string) => void; index: number }) {
