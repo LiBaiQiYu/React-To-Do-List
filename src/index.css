@@ -10,3 +10,7 @@
 .line{
   animation: fade 3s linear forwards;
 }
+
+body{
+  background: #E5E6E7;
+}

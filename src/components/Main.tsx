@@ -77,7 +77,7 @@ export default function Main() {
     setOpen(false)
   }
   return (
-    <div style={{ width: '800px', minHeight: '800px', margin: '20px auto', border: 'solid 1px #EEEEEE', borderRadius: '10px', boxSizing: 'border-box', padding: '20px', boxShadow: '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)' }}>
+    <div style={{ backgroundColor:'#FFF',width: '800px', minHeight: '800px', margin: '20px auto', border: 'solid 1px #EEEEEE', borderRadius: '10px', boxSizing: 'border-box', padding: '20px', boxShadow: '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)' }}>
       <Top state={topProps} />
       <TodoList state={listProps} />
       <Snackbar
