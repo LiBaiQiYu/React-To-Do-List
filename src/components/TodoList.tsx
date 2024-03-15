@@ -27,6 +27,7 @@ export default function TodoList(props: { state: listProps }) {
     setListArr
   }
 
+  
   let newItem = listArr.filter((item) => {
     if (value === "1") {
       return item
