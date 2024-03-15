@@ -36,6 +36,8 @@ export default function TodoList(props: { state: listProps }) {
       return !item.checked
     }
   }).map((i, index) => <ListItem state={i} key={i.inputValue} index={index} item={itemProps} />)
+
+  
   return (
     <div>
       <RadioGroup
