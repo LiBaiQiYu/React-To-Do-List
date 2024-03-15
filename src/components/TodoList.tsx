@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import ListItem from "./ListItem";
 import { RadioGroup, FormControlLabel, Radio, FormGroup } from '@mui/material';
 
-export default function TodoList(props: { state: { listArr: Item[]; setListArr: React.Dispatch<React.SetStateAction<Item[]>>; setOpen: React.Dispatch<React.SetStateAction<boolean>>; setMsg: React.Dispatch<React.SetStateAction<string>>; }; }) {
+export default function TodoList(props: { state: listProps }) {
   const [value, setValue] = useState("1");
-  const { listArr, setListArr, setOpen, setMsg } = props.state;
+  const { list, listArr, setListArr, setOpen, setMsg } = props.state;
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(listArr)
     let del = false
     listArr.forEach(item => {
       item.timer.current?.forEach(i => {
@@ -16,25 +15,19 @@ export default function TodoList(props: { state: { listArr: Item[]; setListArr: 
           setOpen(true)
         }
       })
-
     })
     if (!del) {
       setValue(e.target.value);
     }
-
   };
-  const checkChange = (key: string) => {
-    console.log(key)
-    let newArr = listArr.slice();
-    newArr.forEach(item => {
-      if (item.key === key) {
-        item.checked = !item.checked
-      }
-    })
-    setListArr(newArr);
+
+  const itemProps: itemProps = {
+    list,
+    listArr,
+    setListArr
   }
 
-  let newItem = listArr.filter((item: Item) => {
+  let newItem = listArr.filter((item) => {
     if (value === "1") {
       return item
     } else if (value === "2") {
@@ -42,7 +35,7 @@ export default function TodoList(props: { state: { listArr: Item[]; setListArr: 
     } else {
       return !item.checked
     }
-  }).map((i, index) => <ListItem state={i} key={i.key} index={index} checkChange={() => checkChange(i.key)} />)
+  }).map((i, index) => <ListItem state={i} key={i.inputValue} index={index} item={itemProps} />)
   return (
     <div>
       <RadioGroup
@@ -50,7 +43,7 @@ export default function TodoList(props: { state: { listArr: Item[]; setListArr: 
         aria-labelledby="demo-row-radio-buttons-group-label"
         name="row-radio-buttons-group"
         onChange={onChange} value={value}
-        style={{marginBottom:'20px'}}
+        style={{ marginBottom: '20px' }}
       >
         <FormControlLabel value={"1"} control={<Radio />} label="ALL" />
         <FormControlLabel value={"2"} control={<Radio />} label="DONE" />

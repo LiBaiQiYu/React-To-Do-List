@@ -1,8 +1,37 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { TextField, Button } from '@mui/material';
 
-export default function Top(props: { state: { inputValue: string; setInputValue: React.Dispatch<React.SetStateAction<string>>; addList: () => void; }; }) {
-  const { inputValue, setInputValue, addList } = props.state;
+export default function Top(props: { state: topProps }) {
+  const { inputValue, setInputValue, listArr, setListArr, setMsg, setOpen } = props.state;
+  const timer = useRef<number[] | undefined[]>([]);
+  
+  const addList = () => {
+    let newItem: Item = {
+      inputValue,
+      timer,
+      checked: false,
+    }
+    if (inputValue === '') return;
+    if (listArr.length === 0) {
+      setListArr([...listArr, newItem])
+      setInputValue('')
+    } else {
+      let has = false;
+      listArr.forEach(item => {
+        if (item.inputValue === inputValue) {
+          has = true
+        }
+      })
+      if (!has) {
+        setListArr([...listArr, newItem])
+        setInputValue('')
+      } else {
+        setMsg("Already had same item.")
+        setOpen(true)
+      }
+    }
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       addList()
