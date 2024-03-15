@@ -11,7 +11,7 @@ export default function TodoList(props: { state: listProps }) {
       item.timer.current?.forEach(i => {
         if (i) {
           del = true
-          setMsg("Please do the action after deleting it!")
+          setMsg("Please do the action after deletion!")
           setOpen(true)
         }
       })
